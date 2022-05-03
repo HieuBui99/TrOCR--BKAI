@@ -24,8 +24,14 @@ class Vocab(Transform):
         self.i2c[4] = '<na>'
         
     def encodes(self, chars):
-        res = [self.go] + [self.c2i.get(c, self.na) for c in chars] + [self.eos]
-        res += [self.pad] * (self.max_padding - len(res))
+        res = Munch()
+        input_ids = [self.go] + [self.c2i.get(c, self.na) for c in chars] + [self.eos]
+        attention_mask = [1] * len(input_ids)
+        input_ids += [self.pad] * (self.max_padding - len(input_ids))
+        attention_mask = [0] * (self.max_padding - len(input_ids))
+        
+        res.input_ids = input_ids
+        res.attention_mask = attention_mask
         return res
     
     def decodes(self, ids):
